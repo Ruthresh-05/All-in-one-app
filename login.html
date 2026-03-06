@@ -4,86 +4,114 @@
     <title>Login - UniApp</title>
 
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        body{
+            margin:0;
+            font-family:Arial, sans-serif;
+            background:#0f172a;
+            color:white;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
         }
 
-        .box {
-            background: #1e293b;
-            padding: 40px;
-            border-radius: 12px;
-            text-align: center;
-            width: 320px;
+        .login-box{
+            background:#1e293b;
+            padding:40px;
+            border-radius:12px;
+            width:320px;
+            text-align:center;
         }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 6px;
-            border: none;
+        input{
+            width:100%;
+            padding:12px;
+            margin:10px 0;
+            border:none;
+            border-radius:6px;
         }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            background: #22c55e;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+        button{
+            width:100%;
+            padding:12px;
+            background:#22c55e;
+            border:none;
+            border-radius:6px;
+            color:white;
+            cursor:pointer;
         }
 
-        button:hover {
-            background: #16a34a;
+        button:hover{
+            background:#16a34a;
         }
 
-        a {
-            color: #60a5fa;
-            text-decoration: none;
+        a{
+            color:#60a5fa;
+            text-decoration:none;
         }
     </style>
+
 </head>
 
 <body>
 
-<div class="box">
+<div class="login-box">
+
     <h2>🌸 UniApp Login</h2>
 
     <input type="text" id="username" placeholder="Username">
+
     <input type="password" id="password" placeholder="Password">
 
     <button onclick="login()">Login</button>
 
-    <p>New user? <a href="register.html">Register</a></p>
+    <p>Don't have account?  
+        <a href="register.html">Register</a>
+    </p>
+
 </div>
 
 <script>
-function login() {
 
-    let user = document.getElementById("username").value;
-    let pass = document.getElementById("password").value;
+function login(){
 
-    let users = JSON.parse(localStorage.getItem("users")) || [];
+    let username=document.getElementById("username").value;
+    let password=document.getElementById("password").value;
 
-    let foundUser = users.find(u => u.username === user && u.password === pass);
+    fetch("http://localhost:8080/api/login",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            username:username,
+            password:password
+        })
+    })
+    .then(res=>res.json())
+    .then(data=>{
 
-    if(foundUser) {
-        localStorage.setItem("loggedIn", "true");
-        localStorage.setItem("currentUser", user);
-        window.location.href = "index.html";
-    } else {
-        alert("Invalid username or password");
-    }
+        if(data && data.username){
+
+            localStorage.setItem("loggedIn","true");
+            localStorage.setItem("currentUser",data.username);
+
+            window.location.href="index.html";
+
+        }else{
+
+            alert("Invalid username or password");
+
+        }
+
+    })
+    .catch(err=>{
+        alert("Server not running or connection error");
+        console.log(err);
+    });
+
 }
+
 </script>
 
 </body>
