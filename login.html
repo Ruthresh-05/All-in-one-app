@@ -5,149 +5,209 @@
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, sans-serif;
+}
+
+/* Animated Background */
+
 body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(135deg,#1e3a8a,#0f172a);
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color:white;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(-45deg,#1e3a8a,#0f172a,#2563eb,#1e293b);
+background-size:400% 400%;
+animation:bgMove 12s ease infinite;
+color:white;
 }
 
-.login-box{
-    background:#1e293b;
-    padding:40px;
-    border-radius:12px;
-    width:330px;
-    text-align:center;
+@keyframes bgMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
 }
 
-.login-box h2{
-    margin-bottom:20px;
+/* Login Card */
+
+.login-container{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:40px;
+border-radius:16px;
+width:340px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
-input{
-    width:100%;
-    padding:12px;
-    margin:10px 0;
-    border:none;
-    border-radius:6px;
+.login-container h2{
+margin-bottom:20px;
 }
+
+/* Inputs */
+
+.input-group{
+margin-bottom:15px;
+text-align:left;
+}
+
+.input-group input{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+outline:none;
+}
+
+/* Password toggle */
 
 .password-box{
-    position:relative;
+position:relative;
 }
 
 .password-box span{
-    position:absolute;
-    right:10px;
-    top:14px;
-    cursor:pointer;
+position:absolute;
+right:10px;
+top:12px;
+cursor:pointer;
 }
 
+/* Button */
+
 button{
-    width:100%;
-    padding:12px;
-    background:#22c55e;
-    border:none;
-    border-radius:6px;
-    color:white;
-    cursor:pointer;
-    font-size:15px;
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+background:#22c55e;
+color:white;
+font-size:15px;
+cursor:pointer;
+transition:0.3s;
 }
 
 button:hover{
-    background:#16a34a;
+background:#16a34a;
+transform:scale(1.03);
 }
 
+/* Remember */
+
 .remember{
-    display:flex;
-    align-items:center;
-    font-size:14px;
-    margin:5px 0 15px;
+display:flex;
+align-items:center;
+margin:10px 0;
+font-size:14px;
 }
 
 .remember input{
-    width:auto;
-    margin-right:6px;
+margin-right:6px;
 }
 
+/* Links */
+
 a{
-    color:#60a5fa;
-    text-decoration:none;
+color:#60a5fa;
+text-decoration:none;
 }
 
 .error{
-    color:#f87171;
-    font-size:14px;
+color:#f87171;
+font-size:14px;
+margin-bottom:10px;
+}
+
+/* Loader */
+
+.loader{
+display:none;
+margin-top:10px;
+}
+
+.loader div{
+width:6px;
+height:6px;
+background:white;
+display:inline-block;
+margin:2px;
+border-radius:50%;
+animation:bounce 1s infinite alternate;
+}
+
+.loader div:nth-child(2){animation-delay:0.2s;}
+.loader div:nth-child(3){animation-delay:0.4s;}
+
+@keyframes bounce{
+to{transform:translateY(-6px);}
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="login-box">
+<div class="login-container">
 
 <h2>🌸 UniApp Login</h2>
 
-<div class="error" id="errorMsg"></div>
+<div class="error" id="error"></div>
 
+<div class="input-group">
 <input type="text" id="username" placeholder="Username">
+</div>
 
-<div class="password-box">
+<div class="input-group password-box">
 <input type="password" id="password" placeholder="Password">
 <span onclick="togglePassword()">👁</span>
 </div>
 
 <div class="remember">
-<input type="checkbox" id="remember"> Remember Me
+<input type="checkbox" id="remember"> Remember me
 </div>
 
 <button onclick="login()" id="loginBtn">Login</button>
 
-<p style="margin-top:15px">
-Don't have account?
-<a href="register.html">Register</a>
+<div class="loader" id="loader">
+<div></div><div></div><div></div>
+</div>
+
+<p style="margin-top:15px;">
+New user? <a href="register.html">Register</a>
 </p>
 
 </div>
 
 <script>
 
-/* show hide password */
+/* Show Hide Password */
 
 function togglePassword(){
-    let pass=document.getElementById("password");
+let pass=document.getElementById("password");
 
-    if(pass.type==="password"){
-        pass.type="text";
-    }else{
-        pass.type="password";
-    }
+pass.type=pass.type==="password"?"text":"password";
 }
 
-/* login */
+/* Login Function */
 
 function login(){
 
 let username=document.getElementById("username").value;
 let password=document.getElementById("password").value;
-
-let error=document.getElementById("errorMsg");
-let button=document.getElementById("loginBtn");
+let error=document.getElementById("error");
+let loader=document.getElementById("loader");
 
 error.innerText="";
 
 if(username==="" || password===""){
-error.innerText="Please enter username and password";
+error.innerText="Please fill all fields";
 return;
 }
 
-button.innerText="Logging in...";
-button.disabled=true;
+loader.style.display="block";
 
 fetch("http://localhost:8080/api/login",{
 
@@ -163,12 +223,12 @@ password:password
 })
 
 })
+
 .then(res=>res.json())
 
 .then(data=>{
 
-button.innerText="Login";
-button.disabled=false;
+loader.style.display="none";
 
 if(data && data.username){
 
@@ -190,29 +250,21 @@ error.innerText="Invalid username or password";
 })
 
 .catch(err=>{
-
-button.innerText="Login";
-button.disabled=false;
-
+loader.style.display="none";
 error.innerText="Server connection error";
-
-console.log(err);
-
 });
 
 }
 
-/* enter key login */
+/* Enter Key Login */
 
 document.addEventListener("keypress",function(e){
-
 if(e.key==="Enter"){
 login();
 }
-
 });
 
-/* remember user */
+/* Remember Username */
 
 window.onload=function(){
 
