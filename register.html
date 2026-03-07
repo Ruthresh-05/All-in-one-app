@@ -1,105 +1,290 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Register - UniApp</title>
+<title>UniApp Register</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<style>
 
-        .box {
-            background: #1e293b;
-            padding: 40px;
-            border-radius: 12px;
-            text-align: center;
-            width: 320px;
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, sans-serif;
+}
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 6px;
-            border: none;
-        }
+/* Animated background */
 
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(-45deg,#1e3a8a,#0f172a,#2563eb,#1e293b);
+background-size:400% 400%;
+animation:bgMove 12s ease infinite;
+color:white;
+}
 
-        button:hover {
-            background: #2563eb;
-        }
+@keyframes bgMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
 
-        a {
-            color: #60a5fa;
-            text-decoration: none;
-        }
-    </style>
+/* Register card */
+
+.register-container{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:40px;
+border-radius:16px;
+width:360px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+.register-container h2{
+margin-bottom:20px;
+}
+
+/* Inputs */
+
+.input-group{
+margin-bottom:15px;
+text-align:left;
+}
+
+.input-group input{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+outline:none;
+}
+
+/* Password toggle */
+
+.password-box{
+position:relative;
+}
+
+.password-box span{
+position:absolute;
+right:10px;
+top:12px;
+cursor:pointer;
+}
+
+/* Button */
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+background:#3b82f6;
+color:white;
+font-size:15px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#2563eb;
+transform:scale(1.03);
+}
+
+/* Password strength */
+
+.strength{
+height:6px;
+border-radius:4px;
+margin-top:5px;
+}
+
+/* Error */
+
+.error{
+color:#f87171;
+font-size:14px;
+margin-bottom:10px;
+}
+
+/* Loader */
+
+.loader{
+display:none;
+margin-top:10px;
+}
+
+.loader div{
+width:6px;
+height:6px;
+background:white;
+display:inline-block;
+margin:2px;
+border-radius:50%;
+animation:bounce 1s infinite alternate;
+}
+
+.loader div:nth-child(2){animation-delay:0.2s;}
+.loader div:nth-child(3){animation-delay:0.4s;}
+
+@keyframes bounce{
+to{transform:translateY(-6px);}
+}
+
+a{
+color:#60a5fa;
+text-decoration:none;
+}
+
+</style>
+
 </head>
 
 <body>
 
-<div class="box">
-    <h2>🌸 Create Account</h2>
+<div class="register-container">
 
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+<h2>🌸 Create Account</h2>
 
-    <button onclick="register()">Register</button>
+<div class="error" id="error"></div>
 
-    <p>Already have account? <a href="login.html">Login</a></p>
+<div class="input-group">
+<input type="text" id="username" placeholder="Username">
+</div>
+
+<div class="input-group password-box">
+<input type="password" id="password" placeholder="Password" onkeyup="checkStrength()">
+<span onclick="togglePassword()">👁</span>
+<div class="strength" id="strength"></div>
+</div>
+
+<div class="input-group">
+<input type="password" id="confirmPassword" placeholder="Confirm Password">
+</div>
+
+<button onclick="register()" id="registerBtn">Register</button>
+
+<div class="loader" id="loader">
+<div></div><div></div><div></div>
+</div>
+
+<p style="margin-top:15px;">
+Already have account?
+<a href="login.html">Login</a>
+</p>
+
 </div>
 
 <script>
-function register() {
 
-    let user = document.getElementById("username").value;
-    let pass = document.getElementById("password").value;
-    let confirm = document.getElementById("confirmPassword").value;
+/* Show hide password */
 
-    if(user === "" || pass === "" || confirm === "") {
-        alert("Fill all fields");
-        return;
-    }
-
-    if(pass !== confirm) {
-        alert("Passwords do not match");
-        return;
-    }
-
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-
-    let exists = users.find(u => u.username === user);
-
-    if(exists) {
-        alert("User already exists");
-        return;
-    }
-
-    users.push({ username: user, password: pass });
-
-    localStorage.setItem("users", JSON.stringify(users));
-
-    alert("Registration successful!");
-    window.location.href = "login.html";
+function togglePassword(){
+let pass=document.getElementById("password");
+pass.type=pass.type==="password"?"text":"password";
 }
+
+/* Password strength */
+
+function checkStrength(){
+
+let pass=document.getElementById("password").value;
+let bar=document.getElementById("strength");
+
+if(pass.length<4){
+bar.style.width="30%";
+bar.style.background="red";
+}
+else if(pass.length<7){
+bar.style.width="60%";
+bar.style.background="orange";
+}
+else{
+bar.style.width="100%";
+bar.style.background="green";
+}
+
+}
+
+/* Register */
+
+function register(){
+
+let username=document.getElementById("username").value;
+let password=document.getElementById("password").value;
+let confirm=document.getElementById("confirmPassword").value;
+
+let error=document.getElementById("error");
+let loader=document.getElementById("loader");
+
+error.innerText="";
+
+if(username==="" || password==="" || confirm===""){
+error.innerText="Please fill all fields";
+return;
+}
+
+if(password!==confirm){
+error.innerText="Passwords do not match";
+return;
+}
+
+loader.style.display="block";
+
+fetch("http://localhost:8080/api/register",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+username:username,
+password:password
+})
+
+})
+
+.then(res=>res.text())
+
+.then(data=>{
+
+loader.style.display="none";
+
+if(data==="Registered successfully"){
+
+alert("Account created successfully!");
+window.location.href="login.html";
+
+}else{
+
+error.innerText=data;
+
+}
+
+})
+
+.catch(err=>{
+loader.style.display="none";
+error.innerText="Server connection error";
+});
+
+}
+
+/* Enter key submit */
+
+document.addEventListener("keypress",function(e){
+
+if(e.key==="Enter"){
+register();
+}
+
+});
+
 </script>
 
 </body>
